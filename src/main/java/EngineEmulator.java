@@ -1,12 +1,12 @@
-import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import jssc.SerialPort;
+import jssc.SerialPortException;
+import jssc.SerialPortList;
 
-/**
- * Created by laptop on 21.05.2015.
- */
+import java.util.Scanner;
 
 public class EngineEmulator {
+
+    public static SerialPort serialPort;
 
     public static void main (String[] args) {
 
@@ -22,27 +22,51 @@ public class EngineEmulator {
         if (args.length > 0) {
             portName = args[0].toUpperCase();
             baudRate = Integer.parseInt(args[1]);
-            stopBits = Integer.parseInt(args[2]);
-            parity = Integer.parseInt(args[3]);
+            dataBits = Integer.parseInt(args[2]);
+            stopBits = Integer.parseInt(args[3]);
+            parity = Integer.parseInt(args[4]);
         }
 
         System.out.println("Engine emulator. Version 0.01.");
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Runnable terminal = new DevTerminal(portName, baudRate, dataBits, stopBits, parity);
-        executor.execute(terminal);
+        System.out.println("Port name: " + portName);
+        System.out.println("Baud rate: " + baudRate);
+        System.out.println("Stop bits: " + stopBits);
+        System.out.println("Data bits: " + dataBits);
+        System.out.println("Parity: " + parity);
+
+        serialPort = new SerialPort(portName);
+        MessageEventListener listener = new MessageEventListener(serialPort);
+        String[] portNames = SerialPortList.getPortNames();
+
+        try {
+            serialPort.openPort();
+            serialPort.setParams(baudRate, dataBits, stopBits, parity);
+        } catch (SerialPortException e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            serialPort.addEventListener(listener);
+        } catch (SerialPortException e) {
+            System.out.println(e.getMessage());
+        }
+
 
         scanner = new Scanner(System.in);
         while (!exit) {
             switch (command = scanner.nextLine()) {
                 case "sd":
                     System.out.println("Execute SHUTDOWN command.");
+                    try {
+                        serialPort.removeEventListener();
+                    } catch (SerialPortException e) {
+                        System.out.println(e.getMessage());
+                    }
                     exit = true;
                     break;
                 default:
                     break;
             }
         }
-        System.out.println("asdasd");
-        executor.shutdown();
     }
 }
