@@ -1,13 +1,10 @@
-import jssc.SerialPort;
 import jssc.SerialPortException;
 
 public class TestMessageHandler implements ICOMRequestProcessor {
 
-    final SerialPort serialPort;
     COMRequest request;
 
-    public TestMessageHandler(SerialPort serialPort) {
-        this.serialPort = serialPort;
+    public TestMessageHandler() {
     }
 
     @Override
@@ -24,10 +21,16 @@ public class TestMessageHandler implements ICOMRequestProcessor {
     public void processAsync() {
         System.out.println("Request msg: " + request.getMessage());
         String response = "RESPONSE";
-        synchronized (serialPort) {
+        synchronized (EngineEmulator.serialPort) {
             System.out.println("Process sync writing to COM port: " + response);
             try {
-                serialPort.writeString(response);
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                EngineEmulator.serialPort.writeString(response);
             } catch (SerialPortException e) {
                 System.out.println(e.getMessage());
             }

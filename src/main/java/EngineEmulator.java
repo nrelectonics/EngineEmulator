@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class EngineEmulator {
 
-    public static SerialPort serialPort;
+    public static volatile SerialPort serialPort;
 
     public static void main (String[] args) {
 
@@ -35,8 +35,7 @@ public class EngineEmulator {
         System.out.println("Parity: " + parity);
 
         serialPort = new SerialPort(portName);
-        MessageEventListener listener = new MessageEventListener(serialPort);
-        String[] portNames = SerialPortList.getPortNames();
+        MessageEventListener listener = new MessageEventListener();
 
         try {
             serialPort.openPort();
