@@ -64,6 +64,12 @@ public class EngineEmulator {
                     }
                     exit = true;
                     break;
+                case "pl":
+                    System.out.println("Execute PORTLIST command.");
+                    for (String s : SerialPortList.getPortNames()) {
+                        System.out.println(s);
+                    }
+                    break;
                 default:
                     break;
             }
