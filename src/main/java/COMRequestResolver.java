@@ -1,8 +1,6 @@
-import jssc.SerialPort;
-
 public class COMRequestResolver {
-    public ICOMRequestProcessor getCurrentHandler(COMRequest request, SerialPort serialPort) {
-        ICOMRequestProcessor processor = new TestMessageHandler(serialPort);
+    public ICOMRequestProcessor getCurrentHandler(COMRequest request) {
+        ICOMRequestProcessor processor = new TestMessageHandler();
         processor.setCOMRequest(request);
         return processor;
     }

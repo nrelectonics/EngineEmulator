@@ -1,4 +1,3 @@
-import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
@@ -9,23 +8,21 @@ import java.util.concurrent.Executors;
 public class MessageEventListener implements SerialPortEventListener {
     ExecutorService executorService;
     COMRequestResolver comRequestResolver;
-    final SerialPort serialPort;
 
-    public MessageEventListener(SerialPort _serialPort) {
+    public MessageEventListener() {
         executorService = Executors.newFixedThreadPool(10);
         comRequestResolver = new COMRequestResolver();
-        serialPort = _serialPort;
     }
 
     @Override
     public void serialEvent(SerialPortEvent serialPortEvent) {
         COMRequest request = new COMRequest();
         try {
-            request.setMessage(serialPort.readString());
+            request.setMessage(EngineEmulator.serialPort.readString());
         } catch (SerialPortException e) {
             e.printStackTrace();
         }
-        ICOMRequestProcessor processor = comRequestResolver.getCurrentHandler(request, serialPort);
+        ICOMRequestProcessor processor = comRequestResolver.getCurrentHandler(request);
         ThreadWorker worker = new ThreadWorker(processor);
         executorService.execute(worker);
         System.out.println("Serial port event type: " + serialPortEvent.getEventType());
